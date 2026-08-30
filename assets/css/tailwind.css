@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: "Vazir";
+    src: url('../fonts/vazirmatn/Vazirmatn[wght].woff2') format('woff2');
+    font-display: swap;
+
+}
+@font-face {
+    font-family: "Pacifico";
+    src: url(../fonts/Pacifico-Regular.ttf);
+}
+* {
+    font-family: "Vazir";
+    direction: rtl;
+}
+
+.direction-set-rtl {
+    direction: rtl;
+}
+
+.fade-in-iamge {
+    animation: fadeIn 1s;
+}
+
+
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
