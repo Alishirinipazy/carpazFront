@@ -23,8 +23,8 @@ useHead({ title: 'نمایشگاه خودرو' })
   <LayoutsHeader />
 
   <!-- هیرو -->
-  <section class="relative bg-secColor pt-32 pb-24 px-4 overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-b from-black/10 to-secColor opacity-90"></div>
+  <section class="relative pt-32 pb-24 px-4 overflow-hidden bg-no-repeat bg-cover bg-bottom" style="background: url('/images/back.jpg');">
+    <div class="absolute "></div>
     <div class="relative z-10 text-center max-w-2xl mx-auto">
       <p class="text-mainColor text-sm font-bold mb-3">راحت‌ترین راه پیدا کردن خودروی مناسب</p>
       <h1 class="text-3xl md:text-5xl font-extrabold text-white leading-tight mb-6">
@@ -46,6 +46,7 @@ useHead({ title: 'نمایشگاه خودرو' })
 
   <UContainer>
     <HomeCategoryTypes />
+    <HomeBrandTypes />
 
     <!-- آمار -->
     <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 my-10">

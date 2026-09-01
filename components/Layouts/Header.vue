@@ -50,7 +50,14 @@ if (props?.fixed) {
             <img src="/images/logo2.webp" class="w-[110px]" alt="">
           </nuxt-link>
         </div>
-        <div class="w-1/3 flex justify-end mx-1">
+        <div class="w-1/3 flex justify-end items-center mx-1">
+
+          <NuxtLink to="/sell-your-car" class="hidden lg:block">
+            <UButton class="rounded-full mx-1" icon="mdi:cash-fast" color="white" variant="solid"
+                     :ui="{ color: { white: { solid: 'bg-white text-secColor hover:bg-gray-100 font-bold' } } }">
+              فروش ماشین شما
+            </UButton>
+          </NuxtLink>
 
           <div class="hidden lg:block">
             <NuxtLink to="/favorites">
@@ -93,6 +100,10 @@ if (props?.fixed) {
             <UIcon name="mdi:cards-heart" class="w-5 h-5"/>
           </UChip>
           <p>علاقه‌مندی</p>
+        </nuxt-link>
+        <nuxt-link to="/sell-your-car" class="header-item" :class="{'text-amber-400': $route.path==='/sell-your-car'}">
+          <UIcon name="mdi:cash-fast" class="w-5 h-5"/>
+          <p>فروش ماشین</p>
         </nuxt-link>
         <nuxt-link to="/auth/login" class="header-item" v-if="!authUser">
           <UIcon name="octicon:sign-in-16" class="w-5 h-5"/>

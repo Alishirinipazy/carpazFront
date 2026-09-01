@@ -11,6 +11,7 @@ useHead({
   <!-- چت‌بات روی همه صفحات -->
   <ClientOnly>
     <ChatBot/>
+    <PwaInstallPrompt/>
   </ClientOnly>
 </template>
 

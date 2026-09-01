@@ -33,7 +33,8 @@ function iconFor(name) {
     <div class="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-8 gap-3">
       <NuxtLink v-for="c in categories" :key="c.id" :to="`/cars?category=${c.id}`"
                 class="flex flex-col items-center gap-2 p-4 rounded-2xl border border-gray-100 hover:border-mainColor hover:shadow-md transition-all">
-        <UIcon :name="iconFor(c.name)" class="w-7 h-7 text-secColor" />
+        <img v-if="c.image" :src="c.image" class="w-9 h-9 object-cover rounded-lg" :alt="c.name" />
+        <UIcon v-else :name="iconFor(c.name)" class="w-7 h-7 text-secColor" />
         <span class="text-xs text-gray-500 truncate w-full text-center">{{ c.name }}</span>
       </NuxtLink>
     </div>
