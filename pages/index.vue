@@ -67,22 +67,22 @@ useHead({ title: 'نمایشگاه خودرو' })
       <h2 class="text-white text-2xl font-extrabold mb-8">چرا ما رو انتخاب کنی؟</h2>
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div>
-          <UIcon name="mdi:cash-multiple" class="w-8 h-8 text-white mb-2" />
+          <CarPazIcon name="finance" size="44px" class="text-white mb-2" />
           <h4 class="text-white font-bold mb-1">تسهیلات ویژه‌ی خرید</h4>
           <p class="text-white/70 text-sm">کارشناسان مالی ما راه‌حل مناسب مالی برات پیدا می‌کنن.</p>
         </div>
         <div>
-          <UIcon name="mdi:certificate" class="w-8 h-8 text-white mb-2" />
+          <CarPazIcon name="trust" size="44px" class="text-white mb-2" />
           <h4 class="text-white font-bold mb-1">نمایشگاه مورد اعتماد</h4>
           <p class="text-white/70 text-sm">هر خودرو قبل از عرضه، بازرسی فنی می‌شه.</p>
         </div>
         <div>
-          <UIcon name="mdi:tag-outline" class="w-8 h-8 text-white mb-2" />
+          <CarPazIcon name="price" size="44px" class="text-white mb-2" />
           <h4 class="text-white font-bold mb-1">قیمت‌گذاری شفاف</h4>
           <p class="text-white/70 text-sm">بدون هزینه‌ی پنهان، قیمت واقعی بازار.</p>
         </div>
         <div>
-          <UIcon name="mdi:car-wrench" class="w-8 h-8 text-white mb-2" />
+          <CarPazIcon name="service" size="44px" class="text-white mb-2" />
           <h4 class="text-white font-bold mb-1">خدمات تخصصی خودرو</h4>
           <p class="text-white/70 text-sm">تیم فنی ما همیشه در کنارته.</p>
         </div>
