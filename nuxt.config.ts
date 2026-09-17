@@ -77,7 +77,7 @@ export default defineNuxtConfig({
         head: {
             htmlAttrs: { lang: 'fa', dir: 'rtl' },
             link: [
-                { rel: 'icon', type: 'image/x-icon', href: '/icon.ico' },
+                { rel: 'icon', type: 'image/x-icon', href: '/pwa-icons/icon.ico' },
                 { rel: 'apple-touch-icon', href: '/pwa-icons/apple-touch-icon.png' },
             ],
             meta: [
