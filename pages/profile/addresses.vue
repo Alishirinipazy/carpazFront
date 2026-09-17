@@ -2,6 +2,8 @@
 import {z} from 'zod'
 import type {FormSubmitEvent} from '#ui/types'
 
+useSeoMeta({ title: 'آدرس‌های من', robots: 'noindex, nofollow' })
+
 // ─── Data & State ───────────────────────────────────────────────────────────
 const {data, refresh} = await useFetch('/api/profile/addressess', {
   headers: useRequestHeaders(['cookie'])

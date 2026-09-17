@@ -1,4 +1,10 @@
 <script setup>
+const props = defineProps({
+  // وقتی داخل یک صفحه‌ی دیگه (مثل فروش ماشین یا فرم خرید) نشون داده میشه:
+  // بدون لوگو (که شلوغ نشه) و بدون پرش به صفحه‌ی جداگانه‌ی ورود
+  embedded: { type: Boolean, default: false }
+})
+
 const toast = useToast()
 const emit = defineEmits(['showCheckOtpForm'])
 const router = useRouter()
@@ -25,11 +31,14 @@ async function login() {
     })
 
     toast.add({ title: `کد تایید به شماره ${cellphone.value} ارسال شد` })
-    emit('showCheckOtpForm')
-    router.push({
-      path: '/auth/login',
-      query: { cellphone: cellphone.value }
-    })
+    emit('showCheckOtpForm', cellphone.value)
+
+    if (!props.embedded) {
+      router.push({
+        path: '/auth/login',
+        query: { cellphone: cellphone.value }
+      })
+    }
   } catch (error) {
     toast.add({
       title: error?.data?.message || 'مشکلی پیش اومد، دوباره امتحان کن',
@@ -44,9 +53,9 @@ async function login() {
 <template>
   <div class="p-8 border-2 border-mainColor bg-secColor text-white rounded-2xl flex flex-col items-center">
 
-    <img src="/images/logo.webp" alt="نمایشگاه خودرو" class="w-[280px]">
-    <p class="text-xl mt-3 mb-4">ورود و ثبت نام</p>
-    <p class="text-center">شماره تماست برای ما بفرست که یک کدی رو برات بفرستیم</p>
+    <img v-if="!embedded" src="/images/logo.webp" alt="نمایشگاه خودرو" class="w-[280px]">
+    <p class="text-xl mt-3 mb-4" >{{embedded ?'ثبت شماره تماس':'ورود و ثبت نام '}}</p>
+    <p class="text-center">{{ !embedded ? 'برای ورود به حساب ابتدا شماره تماس را وارد کنید' : 'برای ثبت درخواست ابتدا شماره تماس وارد کنید '}}</p>
 
     <form @submit.prevent="login" class="mt-5 w-full text-center">
       <input

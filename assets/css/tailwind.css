@@ -6,7 +6,10 @@
     font-family: "Vazir";
     src: url('../fonts/vazirmatn/Vazirmatn[wght].woff2') format('woff2');
     font-display: swap;
-
+    /* این یک فونت متغیر (variable font) هست - بدون تعیین بازه‌ی وزن، مرورگر
+       فقط وزن ۴۰۰ رو می‌شناسه و کلاس‌های font-bold/font-extrabold تیلویند
+       عملاً بی‌اثر می‌مونن. با این خط، تیترهای بولد واقعاً بولد رندر می‌شن. */
+    font-weight: 100 900;
 }
 @font-face {
     font-family: "Pacifico";
@@ -34,4 +37,53 @@
     100% {
         opacity: 1;
     }
+}
+
+/* ---------------------------------------------------------------------
+   تایپوگرافی و اجزای «اسپرت/ماشینی» - برای اعداد، قیمت و دکمه‌های اکشن
+   --------------------------------------------------------------------- */
+
+/* اعداد قیمت/کارکرد - کمی کج (مثل نگاشتار سرعت‌سنج)، عریض‌تر و
+   هم‌عرض (tabular-nums) تا وقتی عدد عوض می‌شه اندازه نپره */
+.text-sporty-num {
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    font-style: italic;
+    display: inline-block;
+    transform: skewX(-3deg);
+}
+
+/* دکمه‌ی اکشن اصلی سایت - گرادینت قرمز، کج‌شدگی ظریف روی هاور مثل یک
+   برچسب مسابقه‌ای، به‌جای دکمه‌ی صاف/مسطح معمولی */
+.btn-action {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    background-image: linear-gradient(135deg, #ff4c4c 0%, #e10f1f 60%, #b80d1a 100%);
+    box-shadow: 0 8px 20px -6px rgba(225, 15, 31, 0.55);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.btn-action:hover {
+    transform: translateY(-1px) skewX(-2deg);
+    box-shadow: 0 12px 24px -6px rgba(225, 15, 31, 0.65);
+    filter: brightness(1.05);
+}
+.btn-action:active {
+    transform: translateY(0) skewX(0deg);
+}
+
+/* نوار راه‌راه باریک قرمز/تیره در گوشه‌ی کارت‌ها - اشاره‌ی ظریف به
+   پرچم شطرنجی مسابقه، بدون اینکه شلوغ بشه */
+.racing-stripe {
+    background: repeating-linear-gradient(
+        135deg,
+        #e10f1f 0px,
+        #e10f1f 10px,
+        #1b2430 10px,
+        #1b2430 20px
+    );
 }

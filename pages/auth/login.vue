@@ -5,6 +5,7 @@ definePageMeta({
 useHead({
   title:"ورود به اکانت"
 })
+useSeoMeta({ robots: 'noindex, nofollow' })
 const showCheckOTP = ref(false)
 </script>
 <template>

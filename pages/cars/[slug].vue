@@ -34,23 +34,19 @@ const links = computed(() => [
 // فرم درخواست خرید
 const inquirySubmitting = ref(false)
 const inquirySent = ref(false)
-const inquiryForm = ref({ full_name: '', phone: '', message: '', preferred_contact_time: '' })
+const inquiryForm = ref({ message: '', preferred_contact_time: '' })
 
 async function submitInquiry() {
-  if (!authUser.value) {
-    toast.add({ title: 'برای ثبت درخواست خرید باید وارد حساب کاربری بشی', color: 'red' })
-    return navigateTo('/auth/login')
-  }
-  if (!inquiryForm.value.full_name || !inquiryForm.value.phone) {
-    toast.add({ title: 'نام و شماره تماس رو وارد کن', color: 'red' })
-    return
-  }
-
   inquirySubmitting.value = true
   try {
     await $fetch('/api/inquiries/create', {
       method: 'POST',
-      body: { car_id: car.value.id, ...inquiryForm.value }
+      body: {
+        car_id: car.value.id,
+        full_name: authUser.value?.name,
+        phone: authUser.value?.cellphone,
+        ...inquiryForm.value,
+      }
     })
     inquirySent.value = true
     toast.add({ title: 'درخواست شما ثبت شد، کارشناس فروش تماس می‌گیرد ✅', color: 'green' })
@@ -61,7 +57,74 @@ async function submitInquiry() {
   }
 }
 
-useHead({ title: () => car.value?.title || route.params.slug })
+const { public: { siteUrl } } = useRuntimeConfig()
+
+const pageTitle = computed(() => {
+  if (!car.value) return route.params.slug
+  return `${car.value.title} - ${numberFormat(car.value.effective_price)} تومان`
+})
+const pageDescription = computed(() => {
+  if (!car.value) return undefined
+  const base = car.value.description?.trim()
+  if (base) return base.slice(0, 160)
+  return `${car.value.title} - ${car.value.model_year}، کارکرد ${numberFormat(car.value.mileage_km)} کیلومتر، گیربکس ${car.value.transmission_label}. مشاهده قیمت و مشخصات کامل در کارپاز.`
+})
+const pageImage = computed(() => car.value?.primary_image ? `${siteUrl}${car.value.primary_image}` : undefined)
+const canonicalUrl = computed(() => `${siteUrl}/cars/${route.params.slug}`)
+
+useSeoMeta({
+  title: pageTitle,
+  description: pageDescription,
+  ogTitle: pageTitle,
+  ogDescription: pageDescription,
+  ogImage: pageImage,
+  ogType: 'product',
+  ogUrl: canonicalUrl,
+  twitterCard: 'summary_large_image',
+})
+
+useHead(() => ({
+  link: [{ rel: 'canonical', href: canonicalUrl.value }],
+  script: car.value ? [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Vehicle',
+        name: car.value.title,
+        image: pageImage.value,
+        brand: car.value.brand,
+        model: car.value.model_name,
+        vehicleModelDate: String(car.value.model_year || ''),
+        mileageFromOdometer: car.value.mileage_km ? {
+          '@type': 'QuantitativeValue', value: car.value.mileage_km, unitCode: 'KMT',
+        } : undefined,
+        vehicleTransmission: car.value.transmission_label,
+        fuelType: car.value.fuel_type_label,
+        color: car.value.color,
+        offers: {
+          '@type': 'Offer',
+          priceCurrency: 'IRR',
+          price: car.value.effective_price,
+          availability: 'https://schema.org/InStock',
+          url: canonicalUrl.value,
+        },
+      }),
+    },
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'خانه', item: siteUrl },
+          { '@type': 'ListItem', position: 2, name: 'آگهی‌های خودرو', item: `${siteUrl}/cars` },
+          { '@type': 'ListItem', position: 3, name: car.value.title, item: canonicalUrl.value },
+        ],
+      }),
+    },
+  ] : [],
+}))
 </script>
 
 <template>
@@ -87,7 +150,7 @@ useHead({ title: () => car.value?.title || route.params.slug })
           <Swiper :space-between="10" :thumbs="{ swiper: thumbsSwiper }" :modules="[Thumbs, Navigation]"
                   navigation :loop="true" class="mySwiper2">
             <SwiperSlide v-for="(img, i) in displayImages" :key="i">
-              <img :src="img.image" class="w-full object-cover aspect-video" />
+              <img :src="img.image" :alt="`${car?.title || 'خودرو'} - تصویر ${i + 1}`" loading="lazy" class="w-full object-cover aspect-video" />
             </SwiperSlide>
           </Swiper>
 
@@ -100,7 +163,7 @@ useHead({ title: () => car.value?.title || route.params.slug })
         <Swiper v-if="displayImages.length > 1" @swiper="setThumbsSwiper" :space-between="12" :slides-per-view="4"
                 :watch-slides-progress="true" :modules="[Thumbs]" class="mySwiper mt-3">
           <SwiperSlide v-for="(img, i) in displayImages" :key="i">
-            <img :src="img.image" class="rounded-xl cursor-pointer border-2 border-transparent opacity-60 hover:opacity-100 transition-all duration-200 object-cover aspect-video" />
+            <img :src="img.image" :alt="`${car?.title || 'خودرو'} - تصویر بندانگشتی ${i + 1}`" loading="lazy" class="rounded-xl cursor-pointer border-2 border-transparent opacity-60 hover:opacity-100 transition-all duration-200 object-cover aspect-video" />
           </SwiperSlide>
         </Swiper>
 
@@ -112,8 +175,9 @@ useHead({ title: () => car.value?.title || route.params.slug })
         <p class="text-xs font-semibold text-mainColor/80 tracking-wide mb-1">{{ car?.brand }} · {{ car?.category }}</p>
         <h1 class="text-2xl md:text-3xl text-secColor py-1 font-extrabold leading-snug">{{ car?.title }}</h1>
 
-        <p class="text-2xl font-extrabold text-mainColor mt-2">
-          {{ numberFormat(car?.effective_price) }} <span class="text-sm font-medium text-secColor/60">تومان</span>
+        <p class="text-2xl mt-2">
+          <span class="text-sporty-num text-mainColor">{{ numberFormat(car?.effective_price) }}</span>
+          <span class="text-sm font-medium text-secColor/60 mr-1">تومان</span>
         </p>
 
         <div class="h-px bg-gray-100 my-5" />
@@ -166,22 +230,27 @@ useHead({ title: () => car.value?.title || route.params.slug })
             درخواستت با موفقیت ثبت شد ✅
           </div>
 
+          <!-- کاربر لاگین نیست: به‌جای فرم، ورود همین‌جا -->
+          <AuthGate v-else-if="!authUser" />
+
           <form v-else @submit.prevent="submitInquiry" class="space-y-3">
-            <input v-model="inquiryForm.full_name" type="text" placeholder="نام و نام خانوادگی"
-                   class="w-full rounded-xl px-3 py-2.5 text-sm bg-white/10 text-white placeholder:text-white/40 outline-none focus:bg-white/20" />
-            <input v-model="inquiryForm.phone" type="tel" placeholder="شماره موبایل (مثلا 09121234567)"
-                   class="w-full rounded-xl px-3 py-2.5 text-sm bg-white/10 text-white placeholder:text-white/40 outline-none focus:bg-white/20" />
+            <p class="text-white/50 text-xs bg-white/5 rounded-lg px-3 py-2">
+              به نام {{ authUser?.name }} - {{ authUser?.cellphone }}
+            </p>
             <input v-model="inquiryForm.preferred_contact_time" type="text" placeholder="بهترین زمان تماس (اختیاری)"
                    class="w-full rounded-xl px-3 py-2.5 text-sm bg-white/10 text-white placeholder:text-white/40 outline-none focus:bg-white/20" />
             <textarea v-model="inquiryForm.message" rows="2" placeholder="توضیحات (اختیاری)"
                       class="w-full rounded-xl px-3 py-2.5 text-sm bg-white/10 text-white placeholder:text-white/40 outline-none focus:bg-white/20 resize-none"></textarea>
-            <UButton type="submit" block color="yellow" class="font-bold rounded-xl" :loading="inquirySubmitting">
+            <UButton type="submit" block class="btn-action text-white font-extrabold rounded-xl" :loading="inquirySubmitting">
               ثبت درخواست
             </UButton>
           </form>
         </div>
       </div>
     </div>
+
+    <!-- برگ کارشناسی -->
+    <CarInspectionReport v-if="car?.id" :car-id="car.id" />
 
     <!-- خودروهای مشابه -->
     <div v-if="randomCars?.data?.length" class="my-14">

@@ -1,5 +1,6 @@
 <script setup>
 definePageMeta({ layout: 'profile', middleware: 'auth' })
+useSeoMeta({ title: 'درخواست‌های خرید من', robots: 'noindex, nofollow' })
 
 const { data, pending } = await useFetch('/api/profile/inquiries', {
     headers: useRequestHeaders(['cookie'])

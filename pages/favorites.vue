@@ -4,7 +4,7 @@ definePageMeta({ middleware: 'auth' })
 const favorites = useFavoritesStore()
 if (!favorites.loaded) await favorites.fetchAll()
 
-useHead({ title: 'علاقه‌مندی‌ها' })
+useSeoMeta({ title: 'علاقه‌مندی‌ها', robots: 'noindex, nofollow' })
 </script>
 
 <template>

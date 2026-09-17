@@ -5,7 +5,7 @@ useHead({
 </script>
 
 <template>
-  <NuxtLoadingIndicator color="#ffbe33"/>
+  <NuxtLoadingIndicator color="#e10f1f"/>
   <nuxt-page/>
   <UNotifications/>
   <!-- چت‌بات روی همه صفحات -->

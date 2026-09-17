@@ -1,12 +1,23 @@
 <script setup>
+const props = defineProps({
+  embedded: { type: Boolean, default: false },
+  // وقتی embedded هست، شماره از پراپ میاد؛ وگرنه از query string صفحه‌ی ورود خونده میشه
+  cellphone: { type: String, default: '' }
+})
+
+const emit = defineEmits(['verified'])
+
 const toast = useToast();
-const {authUser} = useAuth();
+const { authUser } = useAuth();
 const favorites = useFavoritesStore();
 const route = useRoute()
 const backState = ref("")
 const errorMSG = ref({})
+const loading = ref(false)
 const pattern = /^[0-9]{6}$/;
 const otp = ref(null)
+
+const displayCellphone = computed(() => props.embedded ? props.cellphone : route?.query?.cellphone)
 
 async function chechOTP() {
   if (otp?.value === null) {
@@ -16,6 +27,7 @@ async function chechOTP() {
     toast.add({title:"ساختار کد ناخواناست 🤔"});
     return;
   }
+  loading.value = true
   try {
     const data = await $fetch('/api/auth/checkOtp', {
       method: 'POST',
@@ -25,10 +37,14 @@ async function chechOTP() {
     authUser.value = data
     backState.value = "bg-green-800 text-white"
     await favorites.fetchAll()
-    setTimeout(function () {
-      return navigateTo('/profile/')
-    }, 2000);
 
+    if (props.embedded) {
+      emit('verified')
+    } else {
+      setTimeout(function () {
+        return navigateTo('/profile/')
+      }, 2000);
+    }
 
   } catch (error) {
     errorMSG.value = Object.values(error.data.data.message).flat()
@@ -41,15 +57,15 @@ async function chechOTP() {
 </script>
 <template>
   <div class="p-10 border border-mainColor bg-secColor text-white rounded-2xl flex flex-col items-center  border-2 ">
-    <img src="/images/logo.webp" alt="نمایشگاه خودرو" class="w-[280px]">
-    <br>
-    <p>بچه ها به شماره <span class="text-mainColor "> {{ route?.query?.cellphone }} </span> کد 6 رقمی ارسال کردند</p>
+    <img v-if="!embedded" src="/images/logo.webp" alt="نمایشگاه خودرو" class="w-[280px]">
+    <br v-if="!embedded">
+    <p>بچه ها به شماره <span class="text-mainColor "> {{ displayCellphone }} </span> کد 6 رقمی ارسال کردند</p>
     <p class="text-right mt-5 w-full">کد تایید به حساب کاربری</p>
     <div class="mt-1 ">
-      <input type="tel" maxlength="6" required
-             class="  h-10 border-mainColor border-2 rounded-2xl text-center m-2 text-secColor space-x-28 transition"
+      <input type="tel" maxlength="6" required :disabled="loading"
+             class="  h-10 border-mainColor border-2 rounded-2xl text-center m-2 text-secColor space-x-28 transition disabled:opacity-60"
              :class="backState" v-model="otp" style="letter-spacing: 1vh">
     </div>
-    <u-button color="red" @click="chechOTP">تایید</u-button>
+    <u-button color="red" @click="chechOTP" :loading="loading">تایید</u-button>
   </div>
 </template>

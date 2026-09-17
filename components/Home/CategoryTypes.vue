@@ -23,19 +23,19 @@ function iconFor(name) {
 <template>
   <section class="my-8">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-extrabold text-secColor">جستجو بر اساس نوع خودرو</h2>
+      <h2 class="text-2xl font-extrabold text-mainColor">جستجو بر اساس نوع خودرو</h2>
       <NuxtLink to="/cars" class="text-mainColor text-sm font-bold flex items-center gap-1">
         مشاهده همه
         <UIcon name="material-symbols:arrow-circle-left-outline-rounded" />
       </NuxtLink>
     </div>
 
-    <div class="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-8 gap-3">
+    <div class="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-10 gap-3">
       <NuxtLink v-for="c in categories" :key="c.id" :to="`/cars?category=${c.id}`"
-                class="flex flex-col items-center gap-2 p-4 rounded-2xl border border-gray-100 hover:border-mainColor hover:shadow-md transition-all">
-        <img v-if="c.image" :src="c.image" class="w-9 h-9 object-cover rounded-lg" :alt="c.name" />
+                class="  relative   rounded-2xl border border-gray-100 hover:border-mainColor hover:shadow-md transition-all">
+        <img v-if="c.image" :src="c.image" class="w-100 h-100 object-cover rounded-lg" :alt="c.name" />
         <UIcon v-else :name="iconFor(c.name)" class="w-7 h-7 text-secColor" />
-        <span class="text-xs text-gray-500 truncate w-full text-center">{{ c.name }}</span>
+        <span class=" absolute pt-2 text-xs text-mainColor/50 font-bold truncate w-full text-center">{{ c.name }}</span>
       </NuxtLink>
     </div>
   </section>

@@ -5,6 +5,7 @@ definePageMeta({
 useHead({
   title: 'اکانت'
 })
+useSeoMeta({ robots: 'noindex, nofollow' })
 
 </script>
 <template>

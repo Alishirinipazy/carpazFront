@@ -1,14 +1,19 @@
 <script setup>
-useHead({ title: 'فروش ماشین شما' })
+const { public: { siteUrl } } = useRuntimeConfig()
+useSeoMeta({
+  title: 'فروش ماشین شما',
+  description: 'خودروی خودتون رو مستقیم و بدون واسطه در کارپاز به فروش برسانید - کارشناسی و اعلام قیمت در کمتر از یک روز.',
+  ogTitle: 'فروش ماشین شما به کارپاز',
+  ogType: 'website',
+})
+useHead({ link: [{ rel: 'canonical', href: `${siteUrl}/sell-your-car` }] })
 
 const toast = useToast()
-const phonePattern = /^(\+98|0)?9\d{9}$/
+const { authUser } = useAuth()
 
 const form = ref({
-  full_name: '',
   car_type: '',
   car_model: '',
-  phone: '',
 })
 
 const loading = ref(false)
@@ -17,10 +22,8 @@ const errors = ref({})
 
 function validate() {
   const e = {}
-  if (!form.value.full_name.trim()) e.full_name = 'نام و نام خانوادگی را وارد کنید'
-  if (!form.value.car_type.trim()) e.car_type = 'نوع ماشین را وارد کنید'
-  if (!form.value.car_model.trim()) e.car_model = 'مدل ماشین را وارد کنید'
-  if (!phonePattern.test(form.value.phone)) e.phone = 'شماره موبایل معتبر نیست'
+  if (!form.value.car_type.trim()) e.car_type = 'نام خودرو را وارد کنید'
+  if (!form.value.car_model.trim()) e.car_model = 'سا ساخت خودرو را وارد کنید'
   errors.value = e
   return Object.keys(e).length === 0
 }
@@ -32,7 +35,11 @@ async function submit() {
   try {
     await $fetch('/api/sell-requests/create', {
       method: 'POST',
-      body: form.value,
+      body: {
+        ...form.value,
+        full_name: authUser.value?.name,
+        phone: authUser.value?.cellphone,
+      },
     })
     submitted.value = true
     toast.add({ title: 'درخواست شما با موفقیت ثبت شد', color: 'green' })
@@ -47,15 +54,15 @@ async function submit() {
 }
 
 function resetForm() {
-  form.value = { full_name: '', car_type: '', car_model: '', phone: '' }
+  form.value = { car_type: '', car_model: '' }
   errors.value = {}
   submitted.value = false
 }
 
 const steps = [
   { icon: 'mdi:form-select', title: 'فرم رو پر کن', text: 'مشخصات خودروت رو در چند ثانیه برای ما ارسال کن' },
-  { icon: 'mdi:phone-check-outline', title: 'تماس کارشناس', text: 'کارشناس ما باهات تماس می‌گیره و قیمت پیشنهادی رو اعلام می‌کنه' },
-  { icon: 'mdi:cash-fast', title: 'فروش نقدی', text: 'در صورت توافق، معامله همون روز و به‌صورت نقدی انجام میشه' },
+  { icon: 'mdi:phone-check-outline', title: 'تماس کارشناس', text: 'کارشناس ما باهات تماس می‌گیره و تایم هماهنگی رو اعلام می‌کنه' },
+  { icon: 'mdi:instagram', title: 'تولید محتوا از خودرو', text: 'عکاسی و فیلم برداری و افزودن به آگهی ها کارپــاز' },
 ]
 </script>
 
@@ -70,16 +77,15 @@ const steps = [
     </div>
 
     <u-container class="relative z-10">
-      <div class="flex flex-col items-center text-center py-16 md:py-24">
+      <div class="flex flex-col items-center text-center py-16 md:py-10">
         <span class="inline-flex items-center gap-2 bg-mainColor/15 text-mainColor px-4 py-1.5 rounded-full text-sm font-bold mb-4">
           <UIcon name="mdi:clock-fast" class="w-4 h-4" />
           فروش ماشین شما در کمتر از یک روز
         </span>
         <h1 class="text-white text-3xl md:text-5xl font-extrabold mb-4">فروش ماشین شما</h1>
         <p class="text-white/70 max-w-xl leading-8">
-          خودروی خودتون رو به‌صورت مستقیم و بدون واسطه به ما بفروشید؛ کافیه مشخصات خودرو و
-          شماره تماستون رو ثبت کنید تا کارشناسان ما در کمتر از یک روز باهاتون تماس بگیرن
-          و بهترین قیمت رو پیشنهاد بدن.
+          خودروی خودتون رو به‌صورت مستقیم و بدون واسطه در کارپــاز آگهی کنید؛ کافیه مشخصات خودرو رو
+          ثبت کنید تا کارشناسان ما در کمتر از یک روز باهاتون تماس بگیرن
         </p>
       </div>
     </u-container>
@@ -102,50 +108,33 @@ const steps = [
         </div>
       </div>
 
-      <!-- form -->
+      <!-- form / login gate -->
       <div class="lg:col-span-3">
-        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+
+        <!-- کاربر لاگین نیست: به‌جای فرم، ورود همین‌جا -->
+        <template v-if="!authUser">
+          <AuthGate />
+        </template>
+
+        <div v-else class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
 
           <template v-if="!submitted">
-            <h2 class="text-xl font-extrabold text-secColor mb-1">مشخصات خودرو و تماس</h2>
-            <p class="text-sm text-gray-500 mb-6">اطلاعات زیر رو دقیق پر کنید تا کارشناسان ما سریع‌تر باهاتون تماس بگیرن</p>
+            <div class="flex items-center justify-between mb-1">
+              <h2 class="text-xl font-extrabold text-secColor">مشخصات خودرو</h2>
+              <span class="text-xs bg-gray-100 text-gray-500 rounded-full px-3 py-1">
+                به نام {{ authUser?.name }} - {{ authUser?.cellphone }}
+              </span>
+            </div>
+            <p class="text-sm text-gray-500 mb-6">اطلاعات تماست از حسابت گرفته میشه، فقط مشخصات خودرو رو وارد کن</p>
 
             <form @submit.prevent="submit" class="grid sm:grid-cols-2 gap-4">
-              <div class="sm:col-span-1">
-                <label class="block text-sm font-bold text-secColor mb-1.5">نام و نام خانوادگی</label>
-                <input
-                    v-model="form.full_name"
-                    type="text"
-                    :disabled="loading"
-                    placeholder="مثلاً علی رضایی"
-                    class="w-full rounded-xl border-2 px-4 py-2.5 outline-none transition disabled:opacity-60"
-                    :class="errors.full_name ? 'border-red-400' : 'border-gray-200 focus:border-mainColor'"
-                >
-                <p v-if="errors.full_name" class="text-xs text-red-500 mt-1">{{ errors.full_name }}</p>
-              </div>
-
-              <div class="sm:col-span-1">
-                <label class="block text-sm font-bold text-secColor mb-1.5">شماره تماس</label>
-                <input
-                    v-model="form.phone"
-                    type="tel"
-                    inputmode="numeric"
-                    :disabled="loading"
-                    placeholder="09100000000"
-                    dir="ltr"
-                    class="w-full rounded-xl border-2 px-4 py-2.5 outline-none transition text-left disabled:opacity-60"
-                    :class="errors.phone ? 'border-red-400' : 'border-gray-200 focus:border-mainColor'"
-                >
-                <p v-if="errors.phone" class="text-xs text-red-500 mt-1">{{ errors.phone }}</p>
-              </div>
-
               <div class="sm:col-span-1">
                 <label class="block text-sm font-bold text-secColor mb-1.5">نوع ماشین</label>
                 <input
                     v-model="form.car_type"
                     type="text"
                     :disabled="loading"
-                    placeholder="مثلاً سواری، شاسی‌بلند، وانت"
+                    placeholder="آریزو 6 جی تی"
                     class="w-full rounded-xl border-2 px-4 py-2.5 outline-none transition disabled:opacity-60"
                     :class="errors.car_type ? 'border-red-400' : 'border-gray-200 focus:border-mainColor'"
                 >
@@ -158,7 +147,7 @@ const steps = [
                     v-model="form.car_model"
                     type="text"
                     :disabled="loading"
-                    placeholder="مثلاً پژو ۲۰۶ مدل ۱۴۰۰"
+                    placeholder="2026"
                     class="w-full rounded-xl border-2 px-4 py-2.5 outline-none transition disabled:opacity-60"
                     :class="errors.car_model ? 'border-red-400' : 'border-gray-200 focus:border-mainColor'"
                 >
@@ -186,8 +175,7 @@ const steps = [
               </div>
               <h2 class="text-xl font-extrabold text-secColor mb-2">درخواست شما ثبت شد</h2>
               <p class="text-gray-500 max-w-md leading-7 mb-6">
-                کارشناسان ما در کمتر از یک روز کاری با شماره‌ای که ثبت کردید تماس می‌گیرن
-                و قیمت پیشنهادی برای خودروتون رو اعلام می‌کنن.
+                کارشناسان ما در کمتر از یک روز کاری باهاتون تماس می‌گیرن و هماهنگی های لازم رو انجام میدن.
               </p>
               <button @click="resetForm" class="text-mainColor font-bold border-2 border-mainColor rounded-xl px-6 py-2 hover:bg-mainColor hover:text-white transition">
                 ثبت درخواست جدید

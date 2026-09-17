@@ -15,7 +15,7 @@ function submit() {
 
 <template>
   <form @submit.prevent="submit"
-        class="bg-white/95 backdrop-blur rounded-full shadow-xl p-2 flex flex-col md:flex-row items-stretch md:items-center gap-2 max-w-3xl mx-auto">
+        class="bg-white/95 backdrop-blur rounded-2xl lg:rounded-full shadow-xl p-2 flex flex-col md:flex-row items-stretch md:items-center gap-2 max-w-3xl mx-auto">
 
     <select v-model="form.condition" class="flex-1 bg-transparent text-sm text-secColor px-4 py-2 outline-none">
       <option value="">همه (نو/کارکرده)</option>
@@ -40,9 +40,9 @@ function submit() {
     <div class="hidden md:block w-px h-6 bg-gray-200"></div>
 
     <input v-model="form.search" type="text" placeholder="جستجو (مثلا پژو ۲۰۷)"
-           class="flex-1 bg-transparent text-sm text-secColor px-4 py-2 outline-none placeholder:text-gray-400" />
+           class="flex-1 bg-transparent text-sm border rounded-2xl text-secColor px-4 py-2 outline-none placeholder:text-gray-400" />
 
-    <UButton type="submit" color="yellow" class="rounded-full font-bold px-6 justify-center">
+    <UButton type="submit" color="red" class="btn-action rounded-full text-white px-6">
       <UIcon name="material-symbols:search" class="w-4 h-4" />
       جستجو
     </UButton>

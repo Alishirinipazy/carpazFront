@@ -16,6 +16,8 @@ const conditionBadge = computed(() => {
     <div class="relative">
       <NuxtLink :to="`/cars/${car?.slug}`">
         <img :src="car?.primary_image || '/images/preloader.png'"
+             :alt="car?.title ? `${car.title} - کارپاز` : 'آگهی خودرو - کارپاز'"
+             loading="lazy"
              class="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500" />
       </NuxtLink>
 
@@ -52,9 +54,9 @@ const conditionBadge = computed(() => {
       </div>
 
       <div class="flex items-center justify-between">
-        <p class="font-extrabold text-secColor">
-          {{ numberFormat(car?.effective_price) }}
-          <span class="text-xs font-normal text-gray-400">تومان</span>
+        <p class="text-secColor">
+          <span class="text-sporty-num text-lg text-mainColor">{{ numberFormat(car?.effective_price) }}</span>
+          <span class="text-xs font-normal text-gray-400 mr-1">تومان</span>
         </p>
         <NuxtLink :to="`/cars/${car?.slug}`" class="text-mainColor text-xs font-bold hover:underline">
           مشاهده جزئیات

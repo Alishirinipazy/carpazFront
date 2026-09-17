@@ -9,7 +9,7 @@ module.exports = {
             },
             colors:{
                 mainColor:'#e10f1f',
-                secColor:'#1B2430',
+                secColor:'#050B20',
                 cosColor:'#FF4C4C',
                 darkColor:'#1C1B22',
                 neonColor:'rgba(44,44,44,0)',

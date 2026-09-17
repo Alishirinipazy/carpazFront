@@ -19,7 +19,9 @@ const { data: menu, pending } = await useFetch(() => `${apiBase}/menu`, { query 
 <template>
   <section class="my-8">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-extrabold text-secColor">همه‌ی خودروها رو ببین</h2>
+      <h2 class="text-2xl font-extrabold text-mainColor ">
+
+        خودرو های کارپــاز</h2>
       <NuxtLink to="/cars" class="text-mainColor text-sm font-bold flex items-center gap-1">
         مشاهده همه
         <UIcon name="material-symbols:arrow-circle-left-outline-rounded" />
