@@ -35,10 +35,28 @@ const links = computed(() => [
 const inquirySubmitting = ref(false)
 const inquirySent = ref(false)
 const inquiryForm = ref({ message: '', preferred_contact_time: '' })
+const inquiryNameInput = ref('')
+const inquiryNameError = ref('')
 
 async function submitInquiry() {
+  if (!authUser.value?.name && !inquiryNameInput.value.trim()) {
+    inquiryNameError.value = 'نام و نام خانوادگی را وارد کنید'
+    return
+  }
+  inquiryNameError.value = ''
+
   inquirySubmitting.value = true
   try {
+    // کاربر تازه‌وارد هنوز توی حسابش اسم نداره - همین‌جا ثبتش می‌کنیم تا
+    // دیگه لازم نباشه هرجا دوباره بپرسیم (مثل پروفایل، برای همیشه می‌مونه)
+    if (!authUser.value?.name) {
+      const updated = await $fetch('/api/profile/info/edit', {
+        method: 'POST',
+        body: { name: inquiryNameInput.value.trim() },
+      })
+      authUser.value = { ...authUser.value, ...updated }
+    }
+
     await $fetch('/api/inquiries/create', {
       method: 'POST',
       body: {
@@ -234,9 +252,15 @@ useHead(() => ({
           <AuthGate v-else-if="!authUser" />
 
           <form v-else @submit.prevent="submitInquiry" class="space-y-3">
-            <p class="text-white/50 text-xs bg-white/5 rounded-lg px-3 py-2">
-              به نام {{ authUser?.name }} - {{ authUser?.cellphone }}
+            <p v-if="authUser?.name" class="text-white/50 text-xs bg-white/5 rounded-lg px-3 py-2">
+              به نام {{ authUser.name }} - {{ authUser?.cellphone }}
             </p>
+            <div v-else>
+              <input v-model="inquiryNameInput" type="text" placeholder="نام و نام خانوادگی"
+                     class="w-full rounded-xl px-3 py-2.5 text-sm bg-white/10 text-white placeholder:text-white/40 outline-none focus:bg-white/20"
+                     :class="inquiryNameError ? 'ring-1 ring-red-400' : ''" />
+              <p v-if="inquiryNameError" class="text-red-300 text-xs mt-1">{{ inquiryNameError }}</p>
+            </div>
             <input v-model="inquiryForm.preferred_contact_time" type="text" placeholder="بهترین زمان تماس (اختیاری)"
                    class="w-full rounded-xl px-3 py-2.5 text-sm bg-white/10 text-white placeholder:text-white/40 outline-none focus:bg-white/20" />
             <textarea v-model="inquiryForm.message" rows="2" placeholder="توضیحات (اختیاری)"

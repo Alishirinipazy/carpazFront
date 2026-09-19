@@ -17,6 +17,9 @@ const formState = reactive({
 
 const schema = z.object({
   name:  z.string().min(1, 'نام و نام خانوادگی الزامی است'),
+  email: z.string()
+      .min(1, 'ایمیل الزامی است')
+      .email('ایمیل نامعتبر است')
 })
 
 const loading = ref(false)
@@ -78,7 +81,16 @@ async function onSubmit() {
             />
           </UFormGroup>
 
-
+          <!-- Email -->
+          <UFormGroup label="ایمیل" name="email" required>
+            <UInput
+                v-model="formState.email"
+                type="email"
+                placeholder="example@email.com"
+                icon="i-heroicons-envelope"
+                dir="ltr"
+            />
+          </UFormGroup>
 
           <!-- Phone (read-only) -->
           <UFormGroup label="شماره تلفن">

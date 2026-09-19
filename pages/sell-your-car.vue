@@ -16,12 +16,14 @@ const form = ref({
   car_model: '',
 })
 
+const nameInput = ref('')
 const loading = ref(false)
 const submitted = ref(false)
 const errors = ref({})
 
 function validate() {
   const e = {}
+  if (!authUser.value?.name && !nameInput.value.trim()) e.name = 'نام و نام خانوادگی را وارد کنید'
   if (!form.value.car_type.trim()) e.car_type = 'نام خودرو را وارد کنید'
   if (!form.value.car_model.trim()) e.car_model = 'سا ساخت خودرو را وارد کنید'
   errors.value = e
@@ -33,6 +35,16 @@ async function submit() {
 
   loading.value = true
   try {
+    // کاربر تازه‌وارد هنوز توی حسابش اسم نداره - همین‌جا ثبتش می‌کنیم تا
+    // دیگه لازم نباشه هرجا دوباره بپرسیم (مثل پروفایل، برای همیشه می‌مونه)
+    if (!authUser.value?.name) {
+      const updated = await $fetch('/api/profile/info/edit', {
+        method: 'POST',
+        body: { name: nameInput.value.trim() },
+      })
+      authUser.value = { ...authUser.value, ...updated }
+    }
+
     await $fetch('/api/sell-requests/create', {
       method: 'POST',
       body: {
@@ -85,7 +97,7 @@ const steps = [
         <h1 class="text-white text-3xl md:text-5xl font-extrabold mb-4">فروش ماشین شما</h1>
         <p class="text-white/70 max-w-xl leading-8">
           خودروی خودتون رو به‌صورت مستقیم و بدون واسطه در کارپــاز آگهی کنید؛ کافیه مشخصات خودرو رو
-          ثبت کنید تا کارشناسان ما در کمتر از یک روز باهاتون تماس بگیرن
+          ثبت کنید تا کارشناسان ما در کمتر از یک روز باهاتون تماس بگیرن و بهترین قیمت رو پیشنهاد بدن.
         </p>
       </div>
     </u-container>
@@ -121,13 +133,28 @@ const steps = [
           <template v-if="!submitted">
             <div class="flex items-center justify-between mb-1">
               <h2 class="text-xl font-extrabold text-secColor">مشخصات خودرو</h2>
-              <span class="text-xs bg-gray-100 text-gray-500 rounded-full px-3 py-1">
-                به نام {{ authUser?.name }} - {{ authUser?.cellphone }}
+              <span v-if="authUser?.name" class="text-xs bg-gray-100 text-gray-500 rounded-full px-3 py-1">
+                به نام {{ authUser.name }} - {{ authUser?.cellphone }}
               </span>
             </div>
-            <p class="text-sm text-gray-500 mb-6">اطلاعات تماست از حسابت گرفته میشه، فقط مشخصات خودرو رو وارد کن</p>
+            <p class="text-sm text-gray-500 mb-6">
+              {{ authUser?.name ? 'اطلاعات تماست از حسابت گرفته میشه، فقط مشخصات خودرو رو وارد کن' : 'برای ثبت درخواست، اول اسمت رو وارد کن' }}
+            </p>
 
             <form @submit.prevent="submit" class="grid sm:grid-cols-2 gap-4">
+              <div v-if="!authUser?.name" class="sm:col-span-2">
+                <label class="block text-sm font-bold text-secColor mb-1.5">نام و نام خانوادگی</label>
+                <input
+                    v-model="nameInput"
+                    type="text"
+                    :disabled="loading"
+                    placeholder="مثلاً علی رضایی"
+                    class="w-full rounded-xl border-2 px-4 py-2.5 outline-none transition disabled:opacity-60"
+                    :class="errors.name ? 'border-red-400' : 'border-gray-200 focus:border-mainColor'"
+                >
+                <p v-if="errors.name" class="text-xs text-red-500 mt-1">{{ errors.name }}</p>
+              </div>
+
               <div class="sm:col-span-1">
                 <label class="block text-sm font-bold text-secColor mb-1.5">نوع ماشین</label>
                 <input
